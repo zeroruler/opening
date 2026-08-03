@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>반 배정표 · 여름성경학교</title>
+
+<!-- 웹폰트는 인터넷이 될 때만 적용됩니다. 안 되면 아래 기본 글꼴로 자동 대체돼요. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&display=swap">
+
+<style>
+  :root {
+    --paper: #F6F3EA;
+    --text: #201E19;
+    --text-secondary: #6B6558;
+
+    /* 빔프로젝터로 쏘면 색이 옅게 보이므로, 배경은 은은하게 두고
+       글자 쪽 색(accent)은 진하게 잡아 대비를 확보한다 */
+    --yellow-bg: #FBF1CE;
+    --yellow-accent: #8C6A17;
+    --yellow-line: #E9DCA6;
+
+    --blue-bg: #DEEAF5;
+    --blue-accent: #2F4F73;
+    --blue-line: #C2D6E9;
+
+    --sage-bg: #E1EBDD;
+    --sage-accent: #3C5A38;
+    --sage-line: #C9DBC3;
+
+    --terracotta-bg: #F5E1D5;
+    --terracotta-accent: #8C4020;
+    --terracotta-line: #E8C9B6;
+
+    --font-sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo",
+                 "Noto Sans KR", "Malgun Gothic", sans-serif;
+    --font-serif: "Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", Georgia, serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    color: var(--text);
+    font-family: var(--font-sans);
+  }
+
+  /* 화면 밖(스크롤 튕김 영역)까지 팀 색이 이어지도록 */
+  body {
+    background: linear-gradient(to right, var(--yellow-bg) 50%, var(--blue-bg) 50%);
+    background-attachment: fixed;
+  }
+
+  .stage {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  /* ── 팀별 영역 ── */
+  .class-panel {
+    flex: 1 1 420px;
+    display: flex;
+    justify-content: center;      /* 각 팀 영역 안에서 가운데로 모으고 */
+    align-items: center;          /* 세로도 가운데로 */
+    padding: 64px 48px;
+  }
+
+  .class-panel__inner {
+    width: 100%;
+    max-width: 480px;             /* 너무 벌어지지 않게 폭을 잡아둔다 */
+  }
+
+  .class-panel__head {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .class-panel__homeroom {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 54px;
+    line-height: 1.2;
+  }
+
+  .class-panel__homeroom .suffix {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 26px;
+    margin-left: 6px;
+    color: var(--text-secondary);
+  }
+
+  .class-panel__teachers {
+    margin-top: 10px;
+    font-size: 19px;
+    color: var(--text-secondary);
+  }
+
+  .student-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 28px;
+  }
+
+  .student-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: 38px;
+    font-weight: 700;
+    padding: 12px 4px;
+    border-bottom: 1px solid;
+  }
+
+  .student-list .num {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    min-width: 26px;
+  }
+
+  .student-list .empty {
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 24px;
+    border-bottom: 0;
+  }
+
+  /* ── 팀 색 ── */
+  .tone-ochre { background: var(--yellow-bg); }
+  .tone-ochre .class-panel__homeroom,
+  .tone-ochre .student-list .num { color: var(--yellow-accent); }
+  .tone-ochre .student-list li { border-color: var(--yellow-line); }
+
+  .tone-slate { background: var(--blue-bg); }
+  .tone-slate .class-panel__homeroom,
+  .tone-slate .student-list .num { color: var(--blue-accent); }
+  .tone-slate .student-list li { border-color: var(--blue-line); }
+
+  .tone-sage { background: var(--sage-bg); }
+  .tone-sage .class-panel__homeroom,
+  .tone-sage .student-list .num { color: var(--sage-accent); }
+  .tone-sage .student-list li { border-color: var(--sage-line); }
+
+  .tone-terracotta { background: var(--terracotta-bg); }
+  .tone-terracotta .class-panel__homeroom,
+  .tone-terracotta .student-list .num { color: var(--terracotta-accent); }
+  .tone-terracotta .student-list li { border-color: var(--terracotta-line); }
+
+  /* ── 좁은 화면 ── */
+  @media (max-width: 720px) {
+    body { background: var(--paper); }
+
+    .stage { flex-direction: column; }
+
+    .class-panel { padding: 36px 28px 44px; }
+    .class-panel__homeroom { font-size: 40px; }
+    .student-list { grid-template-columns: 1fr; }
+    .student-list li { font-size: 30px; }
+  }
+
+  /* ── 마침 화면 (스페이스바) ──
+     teachers/index.html 의 마지막 슬라이드(buildClosingCover)와 같은 모습:
+     어둡게 깐 배경 사진 위에 로고만 띄운다 */
+  .closing-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(rgba(38, 36, 31, 0.55), rgba(38, 36, 31, 0.55)),
+      url("etc/bg.jpeg") center / cover no-repeat;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 250ms ease, visibility 250ms ease;
+  }
+
+  .closing-overlay.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .closing-overlay img {
+    display: block;
+    width: 100%;
+    max-width: min(880px, 66vw);
+    max-height: 58vh;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage"></div>
+
+  <div class="closing-overlay" id="closingOverlay">
+    <img src="신나는 성경탐험.png" alt="신나는 성경탐험">
+  </div>
+
+<script>
+/* ============================================================
+   반 배정 내용 — 이 부분만 고치면 화면이 바뀝니다.
+   homeroom : 담임 선생님 (크게 표시)
+   teachers : 함께하는 선생님
+   students : 아이들 이름 (빈 칸 "" 은 "미정" 으로 표시)
+   tone     : 팀 색 — "ochre"(노랑) / "slate"(파랑) / "sage"(초록) / "terracotta"(주황)
+   ============================================================ */
+const CLASSES = [
+  {
+    name: "노란팀",
+    tone: "ochre",
+    homeroom: "이재희",
+    teachers: ["서영윤", "김음파"],
+    students: ["이시아", "김현우", "고하빈", "장미림", "전서진", "김수빈", "김진원"],
+  },
+  {
+    name: "파란팀",
+    tone: "slate",
+    homeroom: "박지훈",
+    teachers: ["김윤서", "김지영"],
+    students: ["신설아", "신시아", "황시윤", "김예서", "전서윤", "강미나", "박성빈"],
+  },
+];
+
+const stage = document.querySelector(".stage");
+
+CLASSES.forEach((cls) => {
+  const panel = document.createElement("section");
+  panel.className = `class-panel tone-${cls.tone}`;
+
+  const teacherLine = cls.teachers && cls.teachers.length
+    ? `<div class="class-panel__teachers">${cls.teachers.join(" · ")} 선생님과 함께해요</div>`
+    : "";
+
+  const students = (cls.students || []).length
+    ? cls.students.map((name, i) => `
+        <li><span class="num">${i + 1}</span>${name || "미정"}</li>
+      `).join("")
+    : `<li class="empty">아직 배정된 아이가 없어요</li>`;
+
+  panel.innerHTML = `
+    <div class="class-panel__inner">
+      <div class="class-panel__head">
+        <div class="class-panel__homeroom">${cls.homeroom}<span class="suffix">선생님 반</span></div>
+        ${teacherLine}
+      </div>
+      <ul class="student-list">${students}</ul>
+    </div>
+  `;
+
+  stage.appendChild(panel);
+});
+
+/* ============================================================
+   스페이스바 — teachers/index.html 마지막 슬라이드(마침 화면)와
+   같은 화면을 띄운다. 다시 누르면 반 배정표로 돌아온다.
+   ============================================================ */
+const closingOverlay = document.getElementById("closingOverlay");
+
+function toggleClosing() {
+  closingOverlay.classList.toggle("is-active");
+}
+
+/* ============================================================
+   b 키 — music 폴더의 노래를 순서대로 재생 (토글 ON/OFF)
+   한/영 전환 상태와 무관하게 항상 물리적 B 키 위치로 동작하도록
+   e.key 대신 e.code(KeyB) 를 검사한다.
+   ============================================================ */
+const MUSIC_FILES = [
+  "music/01.구약 속으로 - 파이디온.mp3",
+  "music/02.성경속으로 여행을 떠나요 - 파이디온.mp3",
+  "music/03.너희는 가만히 서서 - 파이디온.mp3",
+  "music/04.약속의 문 - 파이디온.mp3",
+  "music/05.무화과 나뭇잎이 마르고 - 히즈쇼.mp3",
+];
+
+let musicIndex = 0;
+const bgm = new Audio();
+
+bgm.addEventListener("ended", () => {
+  musicIndex = (musicIndex + 1) % MUSIC_FILES.length;
+  bgm.src = encodeURI(MUSIC_FILES[musicIndex]);
+  bgm.play();
+});
+
+function toggleMusic() {
+  if (!bgm.src) bgm.src = encodeURI(MUSIC_FILES[musicIndex]);
+  if (bgm.paused) bgm.play();
+  else bgm.pause();
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    toggleClosing();
+  } else if (e.code === "KeyB") {
+    e.preventDefault();
+    toggleMusic();
+  }
+});
+</script>
+
+</body>
+</html>
