@@ -360,6 +360,9 @@ document.addEventListener("keydown", (e) => {
   } else if (e.key.toLowerCase() === "f") {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
+  } else if (e.key === "Backspace") {
+    e.preventDefault();
+    location.href = "반배정표.html";
   }
 });
 
