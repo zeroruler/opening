@@ -1,0 +1,643 @@
+/* ============================================================
+   DESIGN.md 토큰 — 이 파일 밖에서 색·크기를 새로 정의하지 않는다
+   ============================================================ */
+:root {
+  /* Primary */
+  --primary: #5A7359;
+  --primary-hover: #4A614A;
+  --primary-active: #3D523E;
+  --primary-soft: #E9EFE5;
+  --primary-soft-border: #CBD8C6;
+  --primary-text: #47603F;
+
+  /* Neutral */
+  --bg: #F9F7F2;
+  --surface: #FFFFFF;
+  --surface-sunken: #F1EEE6;
+  --border: #E7E3D8;
+  --border-strong: #D6D1C4;
+  --text: #26241F;
+  --text-secondary: #5C574C;
+  --text-tertiary: #A39D8F;
+
+  /* Chart — 반 구분 표시(일러스트 용도)에만 사용 */
+  --chart-1: #5A7359;  /* Sage */
+  --chart-2: #BE7C5A;  /* Terracotta */
+  --chart-3: #7B8FA3;  /* Slate */
+  --chart-4: #C0A05C;  /* Ochre */
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadow */
+  --shadow-1: 0 1px 2px rgba(38,36,31,0.05);
+  --shadow-2: 0 2px 8px rgba(38,36,31,0.07);
+  --shadow-3: 0 4px 16px rgba(38,36,31,0.09);
+  --focus-ring: 0 0 0 3px rgba(90,115,89,0.18);
+
+  /* Typography */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, "Noto Sans KR", sans-serif;
+  --font-serif: "Noto Serif KR", "Source Serif 4", Georgia, serif;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+}
+
+/* ------------------------------------------------------------
+   빔프로젝터용 크기 — 화면이 커질수록 같이 커집니다.
+   1920×1080 기준: 이름 49px · TMI 27px · 사진 높이 475px
+   ------------------------------------------------------------ */
+.deck {
+  --container: min(1400px, 86vw);
+
+  /* 사진은 모든 배치에서 동일한 크기 (세로 3:4) */
+  --photo-h: clamp(280px, 66vh, 760px);
+  --photo-w: calc(var(--photo-h) * 3 / 4);
+
+  --fs-display: clamp(36px, 3.3vh + 1.45vw, 74px);
+  --fs-name:    clamp(34px, 3.2vh + 1.4vw, 74px);
+  --fs-heading: clamp(28px, 2.7vh + 1.15vw, 60px);
+  --fs-quote:   clamp(21px, 2.2vh + 0.85vw, 44px);
+  --fs-value:   clamp(19px, 1.9vh + 0.68vw, 38px);
+  --fs-body:    clamp(18px, 1.6vh + 0.6vw, 32px);
+  --fs-label:   clamp(15px, 1.25vh + 0.5vw, 26px);
+  --fs-badge:   clamp(14px, 1.1vh + 0.4vw, 22px);
+
+  /* 개회식 · 대표기도처럼 한 줄만 크게 외칠 때 전용 */
+  --fs-jumbo: clamp(64px, 8vh + 3vw, 168px);
+
+  --gap-col: clamp(32px, 4vw, 72px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   슬라이드 무대
+   ============================================================ */
+.deck {
+  position: relative;
+  height: 100dvh;
+  width: 100%;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 3.5vh, 52px) clamp(28px, 4vw, 80px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-base) var(--ease),
+              visibility var(--dur-base) var(--ease);
+  overflow-y: auto;
+}
+
+.slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.slide__inner {
+  position: relative; /* deck-fly(장식 스티커)보다 항상 위에 그려지도록 */
+  width: 100%;
+  max-width: var(--container);
+}
+
+/* 등장: 아래서 8px 올라오며 fade-in */
+.slide.is-active .reveal {
+  animation: rise var(--dur-slow) var(--ease) backwards;
+}
+.slide.is-active .reveal:nth-child(1) { animation-delay: 40ms; }
+.slide.is-active .reveal:nth-child(2) { animation-delay: 100ms; }
+.slide.is-active .reveal:nth-child(3) { animation-delay: 160ms; }
+.slide.is-active .reveal:nth-child(4) { animation-delay: 220ms; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   표지
+   ============================================================ */
+.cover {
+  text-align: center;
+  max-width: min(960px, 80vw);
+  margin: 0 auto;
+}
+
+.overline {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 16px;
+}
+
+.cover__art { margin: 0 0 clamp(20px, 3vh, 40px); }
+
+.cover__image {
+  display: block;
+  width: 100%;
+  max-width: min(880px, 66vw);
+  max-height: 58vh;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.cover__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 20px;
+}
+
+.cover__subtitle {
+  font-size: var(--fs-quote);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* 개회식 · 대표기도 — 한 줄을 크게 외치는 전용 표지 */
+.overline--jumbo {
+  font-size: var(--fs-heading);
+  margin-bottom: clamp(20px, 3vh, 44px);
+}
+
+.cover__title--jumbo {
+  font-size: var(--fs-jumbo);
+  margin: 0;
+}
+
+/* 첫 표지 — 사진 배경 위에 로고를 올린다 */
+.slide--photo-bg {
+  background:
+    linear-gradient(rgba(38, 36, 31, 0.55), rgba(38, 36, 31, 0.55)),
+    url("etc/bg.jpeg") center / cover no-repeat;
+}
+
+.slide--photo-bg .overline { color: rgba(242, 240, 234, 0.82); }
+.slide--photo-bg .cover__subtitle { color: rgba(242, 240, 234, 0.9); }
+.slide--photo-bg .cover__title { color: #F2F0EA; }
+
+/* ============================================================
+   장식용 캐릭터 스티커 — 메인 콘텐츠 위를 가리지 않는 모서리에만
+   ============================================================ */
+.deck-fly {
+  position: absolute;
+  width: clamp(72px, 8vw, 148px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(var(--shadow-2));
+}
+
+.deck-fly--tl { top: clamp(16px, 3vh, 36px);  left: clamp(16px, 3vw, 44px); }
+.deck-fly--tr { top: clamp(16px, 3vh, 36px);  right: clamp(16px, 3vw, 44px); }
+.deck-fly--bl { bottom: clamp(16px, 3vh, 36px); left: clamp(16px, 3vw, 44px); }
+.deck-fly--br { bottom: clamp(16px, 3vh, 36px); right: clamp(16px, 3vw, 44px); }
+
+@media (max-width: 900px) {
+  .deck-fly { width: clamp(52px, 16vw, 92px); }
+}
+
+/* ============================================================
+   선생님 슬라이드
+   사진 크기는 어느 배치에서나 동일 — 위치와 TMI 모양만 달라진다
+   ============================================================ */
+.teacher {
+  display: grid;
+  gap: var(--gap-col);
+  align-items: stretch;
+}
+
+.teacher--left  { grid-template-columns: var(--photo-w) minmax(0, 1fr); }
+.teacher--right { grid-template-columns: minmax(0, 1fr) var(--photo-w); }
+
+/* 사진 높이에 맞춰 위아래로 펼쳐 채운다 */
+.teacher__info {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(20px, 3vh, 44px);
+  padding: clamp(4px, 1vh, 16px) 0;
+}
+
+/* 한마디가 없으면 블록이 둘뿐이라 벌어져 보인다 — 가운데로 모은다 */
+.teacher__info:not(:has(.quote)) {
+  justify-content: center;
+  gap: clamp(28px, 4.5vh, 64px);
+}
+
+/* --- 사진 (모든 배치 공통) ---------------------------------- */
+.teacher__photo {
+  position: relative;
+  width: var(--photo-w);
+  height: var(--photo-h);
+  flex: none;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-1);
+}
+
+.teacher__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 사진이 아직 없을 때 — 이름 첫 글자 아바타 */
+.teacher__photo--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border-strong);
+}
+
+.teacher__initial {
+  font-family: var(--font-serif);
+  font-size: calc(var(--photo-w) * 0.34);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+
+/* --- 이름 ------------------------------------------------- */
+.teacher__head { margin-bottom: 0; }
+.teacher__head .overline { margin-bottom: 8px; }
+
+.teacher__namerow {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1vw, 20px);
+  flex-wrap: wrap;
+}
+
+.teacher__name {
+  font-size: var(--fs-name);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3em 0.9em;
+  border-radius: 9999px;
+  font-size: var(--fs-badge);
+  font-weight: 600;
+  line-height: 1.4;
+  background: var(--primary-soft);
+  color: var(--primary-text);
+  border: 1px solid var(--primary-soft-border);
+  white-space: nowrap;
+}
+
+/* --- TMI: 줄 목록형 ---------------------------------------- */
+.tmi { margin: 0; padding: 0; }
+
+/* 라벨 칸은 가장 긴 라벨에 맞춰 자동으로 넓어집니다 (줄바꿈 방지) */
+.tmi--rows {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  border-top: 1px solid var(--border);
+}
+
+.tmi--rows .tmi__row { display: contents; }
+
+.tmi--rows .tmi__label,
+.tmi--rows .tmi__value {
+  padding: clamp(16px, 2.9vh, 42px) 0;
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+.tmi--rows .tmi__label {
+  /* 칸 사이는 gap 대신 padding — 아래 구분선이 끊기지 않게 */
+  padding-right: clamp(16px, 2vw, 40px);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--text-tertiary);
+}
+
+.tmi--rows .tmi__value {
+  font-size: var(--fs-value);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* --- TMI: 카드형 ------------------------------------------- */
+.tmi--tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 24px);
+}
+
+.tmi--tiles .tmi__row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: clamp(18px, 2.8vh, 40px) clamp(18px, 1.8vw, 32px);
+  text-align: left;
+}
+
+.tmi--tiles .tmi__label {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: 0 0 6px;
+}
+
+.tmi--tiles .tmi__value {
+  font-size: var(--fs-value);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* 아직 안 채운 항목 */
+.tmi__value--empty { color: var(--text-tertiary); }
+
+/* --- 한마디 (세리프 인용문) --------------------------------- */
+.quote {
+  font-family: var(--font-serif);
+  font-size: var(--fs-quote);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--text);
+  border-left: 4px solid var(--primary-soft-border);
+  padding-left: clamp(16px, 1.6vw, 28px);
+  margin: 0;
+}
+
+/* quote 배치 — 한마디가 슬라이드 맨 위에 크게 */
+.quote--lead {
+  font-size: var(--fs-heading);
+  line-height: 1.5;
+  border-left: 0;
+  padding-left: 0;
+  margin-bottom: clamp(24px, 4vh, 52px);
+}
+
+/* ============================================================
+   반 배정 슬라이드
+   ============================================================ */
+.section-head {
+  text-align: center;
+  margin-bottom: clamp(24px, 4vh, 52px);
+}
+
+.section-head h2 {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.section-head p {
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* 상자 없이 여백으로만 두 반을 나눈다 */
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(40px, 7vw, 120px);
+}
+
+.class-card__head {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 0.9vw, 18px);
+  margin-bottom: clamp(16px, 2.4vh, 32px);
+}
+
+.class-card__chip {
+  width: 0.6em;
+  height: 0.6em;
+  font-size: var(--fs-name);
+  border-radius: 50%;
+  flex: none;
+  background: var(--chart-1);
+}
+
+.class-card--ochre      .class-card__chip { background: var(--chart-4); }
+.class-card--slate      .class-card__chip { background: var(--chart-3); }
+.class-card--terracotta .class-card__chip { background: var(--chart-2); }
+.class-card--sage       .class-card__chip { background: var(--chart-1); }
+
+.class-card__name {
+  font-size: var(--fs-name);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.class-card__block + .class-card__block {
+  margin-top: clamp(24px, 3.6vh, 48px);
+}
+
+.class-card__label {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: 0 0 10px;
+}
+
+/* 담임 — 크게 */
+.class-card__homeroom {
+  font-size: var(--fs-heading);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
+}
+
+/* 함께하는 선생님 — 작게 */
+.class-card__helpers {
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 8px 0 0;
+}
+
+/* 아이들 이름 — 잘 보이게 */
+.students {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  column-gap: clamp(24px, 3vw, 56px);
+  row-gap: clamp(4px, 0.8vh, 12px);
+  margin: 0;
+  padding: 0;
+}
+
+.student {
+  padding: 0.2em 0;
+  font-size: var(--fs-value);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.student--empty {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+/* 반에 속하지 않는 선생님 */
+.support {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: clamp(20px, 3vh, 40px) 0 0;
+  text-align: center;
+}
+
+.support__label {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.support__names {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   미니게임 안내 슬라이드
+   ============================================================ */
+.game {
+  text-align: center;
+  max-width: min(880px, 78vw);
+  margin: 0 auto;
+}
+
+.game__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 clamp(20px, 3vh, 36px);
+}
+
+.game__desc {
+  font-size: var(--fs-quote);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0 0 clamp(28px, 4vh, 48px);
+}
+
+.game__rule {
+  display: inline-block;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-soft-border);
+  color: var(--primary-text);
+  border-radius: var(--radius-lg);
+  padding: clamp(16px, 2.4vh, 28px) clamp(24px, 3vw, 44px);
+  font-size: var(--fs-value);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   좁은 화면 — 노트북 미리보기 · 모바일
+   ============================================================ */
+@media (max-width: 900px) {
+  .deck { --photo-h: clamp(220px, 34vh, 360px); }
+
+  .teacher,
+  .teacher--left,
+  .teacher--right {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+    justify-items: center;
+    text-align: left;
+  }
+
+  .teacher__photo { order: -1; }
+  .teacher__head { text-align: center; }
+  .teacher__namerow { justify-content: center; }
+
+  /* 좁은 화면에서는 라벨을 값 위로 올린다 */
+  .tmi--rows { grid-template-columns: 1fr; }
+  .tmi--rows .tmi__label { padding-bottom: 0; border-bottom: 0; }
+  .tmi--rows .tmi__value { padding-top: 2px; }
+  .tmi--tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .class-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .tmi--tiles { grid-template-columns: 1fr; }
+  .students { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* 접근성 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
